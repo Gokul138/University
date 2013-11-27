@@ -10,15 +10,15 @@ import java.util.Scanner;
 
 
 public class parser {
-	public static void main(String args[]) throws IOException{
-		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
-		parser pr = new parser();
-		pr.get_tables(br);
-//		System.out.println(pr.getTableValuesPart(pr.getTable(br)));
-//		System.out.println(pr.getTableFieldPart(pr.getTable(br)));
-//		System.out.println(pr.getTableName(pr.getTableNamePart((pr.getTable(br)))));
-		br.close();		
-	}
+//	public static void main(String args[]) throws IOException{
+//		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
+//		parser pr = new parser();
+//		pr.get_tables(br);
+////		System.out.println(pr.getTableValuesPart(pr.getTable(br)));
+////		System.out.println(pr.getTableFieldPart(pr.getTable(br)));
+////		System.out.println(pr.getTableName(pr.getTableNamePart((pr.getTable(br)))));
+//		br.close();		
+//	}
 	
 	
 	
@@ -151,7 +151,7 @@ public class parser {
 				if(ridOfTabName == false){
 					String line = br.readLine();
 					if(line!=null)
-					sb.append(line);
+					sb.append(line+"\n");
 					else
 						brEmpty = true;
 				}
@@ -167,8 +167,24 @@ public class parser {
 				}
 			}
 			return sb.toString();
-			}	
+			}
+
+
+
+public static void main(String[] args){
+	String s = "Table name: sdaos pepepe";
+	new parser().getTableName(s);
 }
+
+	public String getValues(String line){
+		String tableName = null;
+			tableName = line.substring(line.lastIndexOf(":") + 1);
+		return tableName;
+	}
+
+
+}
+
 
 //String l_line = sc.nextLine();
 		//if(l_line.matches("(?i).*Table name:.*")){
