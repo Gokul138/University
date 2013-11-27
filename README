@@ -1,0 +1,4 @@
+There are two files in the package, one with Java source code and other file "Words" which contains all the words used by the program in the game.
+
+Put "Words" file in projects path.
+OBS the file doesn't have any extension.
