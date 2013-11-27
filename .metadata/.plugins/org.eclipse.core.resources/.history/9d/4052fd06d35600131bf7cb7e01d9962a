@@ -1,0 +1,47 @@
+package assignment3;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
+
+
+public class parser {
+	public static void main(String args[]){
+		System.out.println("ok");
+	}
+	public ArrayList<String> get_tables() throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
+		ArrayList<String> line = new ArrayList<String>();
+		boolean foundNextTable = false;
+		while(foundNextTable != true){
+			line.add(br.readLine());
+		}
+		br.close();		
+		return line;
+	}
+	
+	public String get_table(BufferedReader br) throws IOException{
+		boolean foundnext = false;
+		while(foundnext!=true){
+			String analyse = br.readLine();
+			if(analyseForNewTable(analyse)==false){
+				
+			}
+			else{
+				
+			}
+		}
+		return null;
+	}
+	private boolean analyseForNewTable(String analyse) {
+		return false;
+	}
+	
+	private String getTableName(String line){
+		line.length();
+		return null;
+	}
+}
+
+	

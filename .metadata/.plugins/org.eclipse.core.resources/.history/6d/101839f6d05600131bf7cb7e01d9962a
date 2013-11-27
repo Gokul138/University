@@ -1,0 +1,23 @@
+package assignment3;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Random;
+
+
+public class parser {
+	public static void main(String args[]){
+		System.out.println("ok");
+	}
+	public String get_table() throws IOException {
+		int rand = new Random().nextInt(63)+1;
+		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
+		String line = null;
+		boolean foundNextTable = false;
+		while(foundNextTable != false){
+			
+		}
+		br.close();		
+		return line;
+	}
+}

@@ -1,0 +1,79 @@
+package assignment3;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+
+public class parser {
+	public static void main(String args[]) throws IOException{
+		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
+		parser pr = new parser();
+		pr.getTableName(pr.getTable(br));
+//		System.out.println(pr.getTable(br));
+//		System.out.println(new parser().getTable(br));
+//		System.out.println(new parser().getTable(br));
+		br.close();		
+	}
+	public ArrayList<String> get_tables() throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
+		ArrayList<String> line = new ArrayList<String>();
+		while(br.ready()){
+			line.add(getTable(br));
+		}
+		br.close();		
+		return line;
+	}
+	
+	public String getTable(BufferedReader br)throws IOException{
+		StringBuilder sb = new StringBuilder();
+		br.mark(1);
+		if(br.read()!=-1){
+			br.reset();
+			boolean foundNextTable=false,endreached = false;
+			sb.append(br.readLine());
+			while(foundNextTable != true&&endreached!=true){
+				br.mark(1);
+				String line = br.readLine();
+				if(!br.ready()){
+					endreached = true;
+				}
+				else if(line.matches("(?i).*Table name:.*")){
+					br.reset();
+					foundNextTable = true;
+				}
+				else{
+					sb.append(line);
+					sb.append(" \r");
+				}
+				}
+			}
+		return sb.toString();
+	}
+
+	
+	
+	
+	public String getTableName(String line){
+		Scanner sc = new Scanner(line);
+		String tableName = null;
+		while(sc.hasNext()){
+			String l_line = sc.nextLine();
+			if(l_line.matches("(?i).*Table name:.*")){
+				tableName = l_line.substring(l_line.lastIndexOf(":") + 1);
+				System.out.println("if-statement");
+				System.out.println(tableName);
+//				System.out.println(sc.next());
+			}
+		}
+
+		sc.close();
+		return tableName;
+	}
+	
+}
+
+	
