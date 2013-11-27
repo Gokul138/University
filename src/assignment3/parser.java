@@ -13,17 +13,21 @@ public class parser {
 	public static void main(String args[]) throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
 		parser pr = new parser();
-
-		System.out.println(pr.getTableValuesPart(pr.getTable(br)));
-		System.out.println(pr.getTableFieldPart(pr.getTable(br)));
-		System.out.println(pr.getTableName(pr.getTableNamePart((pr.getTable(br)))));
+		pr.get_tables(br);
+//		System.out.println(pr.getTableValuesPart(pr.getTable(br)));
+//		System.out.println(pr.getTableFieldPart(pr.getTable(br)));
+//		System.out.println(pr.getTableName(pr.getTableNamePart((pr.getTable(br)))));
 		br.close();		
 	}
-	public ArrayList<String> get_tables() throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
+	
+	
+	
+	public ArrayList<String> get_tables(BufferedReader br) throws IOException {
 		ArrayList<String> line = new ArrayList<String>();
 		while(br.ready()){
-			line.add(getTable(br));
+			String s = getTable(br);
+//			System.out.println(s);
+			line.add(s);
 		}
 		br.close();		
 		return line;
@@ -92,6 +96,14 @@ public class parser {
 			}
 		return sb.toString();
 		}
+	
+	public String getTableFields(String line){
+		String tableName = null;
+		if(line.matches("(?i).*Table fields:.*")){
+			tableName = line.substring(line.lastIndexOf(":") + 1);
+		}
+		return tableName;
+	}
 	
 	public String getTableFieldPart(String line_u) throws IOException{
 		BufferedReader br = new BufferedReader(new StringReader(line_u));
