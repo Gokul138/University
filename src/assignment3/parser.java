@@ -169,13 +169,6 @@ public class parser {
 			return sb.toString();
 			}
 
-
-
-public static void main(String[] args){
-	String s = "Table name: sdaos pepepe";
-	new parser().getTableName(s);
-}
-
 	public String getValues(String line){
 		String tableName = null;
 			tableName = line.substring(line.lastIndexOf(":") + 1);

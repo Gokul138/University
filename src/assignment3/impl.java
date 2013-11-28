@@ -8,27 +8,42 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+
 import java.util.ArrayList;
 
 import com.mysql.jdbc.StringUtils;
 
+
 public class impl {
+
+	static ArrayList<String> tableNames = new ArrayList<String>();
+	
+	Connection connection = null;
+	Statement statement = null;
+	ResultSet resultSet = null;
 
 	String[] columns;
 	String tableName;
-	public static void main(String args[]) throws Exception{
-		Connection connection = null;
-		Statement statement = null;
-		
+	public void createConnection() throws Exception{
+	
 		try{
 			System.out.println("connecting to database");
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/test","root","hello");
 			System.out.println("Connection Successful");
 			statement = connection.createStatement();
-			new impl().uploadfile(statement);
+//			new impl().uploadfile(statement);
 			//statement.execute("INSERT INTO books (name_u,author,publisher) VALUES ('Harry Potter','J.K rowling','apple corporation'),('Harry dPotter','J.K rowlidng','apple corpordation')");
 			//System.out.println("statement inserted");
+			resultSet = statement.executeQuery("Select * From books");
+			while(resultSet.next()){
+				long id = resultSet.getLong("id");
+				String name = resultSet.getString("name_u");
+				String author = resultSet.getString("author");
+				String publisher = resultSet.getString("publisher");
+				System.out.println(id+" "+name+" "+author+" "+ publisher);				
+			}
 		}
 		catch(ClassNotFoundException error){
 			System.out.println("Error1: " + error.getMessage());
@@ -36,17 +51,14 @@ public class impl {
 		catch(SQLException error){
 			System.out.println("Error2: " + error.getMessage());
 		}
-		finally{
-			if(connection!=null)try{connection.close();}catch(SQLException ignore){}
-			if(statement!=null)try{statement.close();}catch(SQLException ignore){}
-		}
+
 	}
 	
 //	public static void main(String args[]) throws Exception{
 //	new impl().uploadfile();	
 //	}
 	
-	private void uploadfile(Statement statement) throws Exception {
+	public void uploadfile(Statement statement) throws Exception {
 //	private void uploadfile() throws Exception {
 		parser p = new parser();
 		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
@@ -58,10 +70,10 @@ public class impl {
 		statement.execute(valString);
 		}
 		br.close();
+		
 	}
 
 	private String constructIVString(String stString, parser p) {
-//		"INSERT INTO books (name_u,author,publisher) VALUES ('Harry Potter','J.K rowling','apple corporation')"
 		StringBuilder sb = new StringBuilder("INSERT INTO "+tableName+" (");
 		for(int i = 0;i<columns.length;i++){
 			sb.append(columns[i]);
@@ -102,6 +114,7 @@ public class impl {
 	private String constructString(String string, parser p) throws IOException {
 		StringBuilder sb = new StringBuilder("CREATE TABLE ");
 		tableName = p.getTableName(p.getTableNamePart(string));
+		tableNames.add(tableName);
 		sb.append(tableName+" (");
 		String[] delmString = removenull(p.getTableFields(p.getTableFieldPart(string)).split(" "));
 		columns = new String[delmString.length/2];
