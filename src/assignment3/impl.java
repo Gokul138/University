@@ -12,6 +12,11 @@ import java.sql.ResultSet;
 
 import java.util.ArrayList;
 
+import javax.swing.JFrame;
+import javax.swing.JTable;
+
+import assignment3Redo.ListTableModel;
+
 import com.mysql.jdbc.StringUtils;
 
 
@@ -37,6 +42,7 @@ public class impl {
 			//statement.execute("INSERT INTO books (name_u,author,publisher) VALUES ('Harry Potter','J.K rowling','apple corporation'),('Harry dPotter','J.K rowlidng','apple corpordation')");
 			//System.out.println("statement inserted");
 			resultSet = statement.executeQuery("Select * From books");
+			test();
 			while(resultSet.next()){
 				long id = resultSet.getLong("id");
 				String name = resultSet.getString("name_u");
@@ -52,6 +58,21 @@ public class impl {
 			System.out.println("Error2: " + error.getMessage());
 		}
 
+	}
+	
+	// Working Piece
+	public void test() throws SQLException{
+		JFrame jf = new JFrame("TestFrame");
+		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		JTable jtb = new JTable();
+
+		ListTableModel model = ListTableModel.createModelFromResultSet( resultSet );
+		jtb.setModel(model);
+		
+		jf.add(jtb);
+		jtb.setVisible(true);
+		jf.setVisible(true);
 	}
 	
 //	public static void main(String args[]) throws Exception{

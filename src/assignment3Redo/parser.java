@@ -1,4 +1,4 @@
-package assignment3;
+package assignment3Redo;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -46,6 +46,7 @@ public class parser {
 				String line = br.readLine();
 				if(!br.ready()){
 					endreached = true;
+					sb.append(line);
 				}
 				else if(line.matches("(?i).*Table name:.*")){
 					br.reset();

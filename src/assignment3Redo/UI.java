@@ -1,0 +1,328 @@
+package assignment3Redo;
+
+import java.awt.CardLayout;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.*;
+
+import javax.swing.Box;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
+import com.jgoodies.forms.factories.FormFactory;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+
+import ui.CoffeesFrame;
+
+
+public class UI extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private final static String Query = "Query";
+	private final static String Table = "Table";
+	
+	public JPanel contentPane;
+	private JTable table;
+	private JTextField txtB1;
+	private JTextField txtB2;
+	private JTextField txtB3;
+	
+	JFrame referenceFrame = this;
+	
+	boolean rowaddEditable = false;
+	
+	DBMS dbms = new DBMS();
+	Statement statement = null;
+	Connection connection = null;
+	ResultSet resultSet = null;
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					UI frame = new UI();
+					frame.setVisible(true);
+					frame.connectToDB();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+
+	protected void connectToDB() throws Exception {
+		dbms.createConnection();
+	}
+
+
+	/**
+	 * Create the frame.
+	 */
+	public UI() {
+
+		//*Database Connections*//
+
+		
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 595, 406);
+		
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		JMenu mnTablechooser = new JMenu("TableChooser");
+		menuBar.add(mnTablechooser);
+		
+		JMenuItem mntmChooseTable = new JMenuItem("Choose Table");
+		mntmChooseTable.addActionListener(new handelers());
+		mnTablechooser.add(mntmChooseTable);
+		
+		JMenuItem mntmQuery = new JMenuItem("Query");
+		mntmQuery.addActionListener(new handelers());
+		mnTablechooser.add(mntmQuery);
+		
+		JMenu mnRowOperations = new JMenu("Row Operations");
+		mnRowOperations.addActionListener(new handelers());
+		menuBar.add(mnRowOperations);
+		
+		JMenuItem mntmDisplay = new JMenuItem("Display");
+		mntmDisplay.addActionListener(new handelers());
+		mnRowOperations.add(mntmDisplay);
+		
+		JMenuItem mntmDelete = new JMenuItem("Delete");
+		mntmDelete.addActionListener(new handelers());
+		mnRowOperations.add(mntmDelete);
+		
+		JMenuItem mntmAdd = new JMenuItem("Add");
+		mntmAdd.addActionListener(new handelers());
+		mnRowOperations.add(mntmAdd);
+		
+		JMenu mnPopulateDatabase = new JMenu("Populate Database");
+		menuBar.add(mnPopulateDatabase);
+		
+		JMenuItem mntmPopulate = new JMenuItem("Populate");
+		mntmPopulate.addActionListener(new handelers());
+		mnPopulateDatabase.add(mntmPopulate);
+
+		contentPane = new JPanel();
+		contentPane.setLayout(new CardLayout());
+
+		
+		table = new JTable();
+		table.setVisible(true);		
+
+		JPanel card1 = new JPanel();
+		card1.setName("Query");
+		
+		JPanel card2 = new JPanel();
+		card2.setName("Table");
+		
+		card2.add(table);
+		
+		contentPane.add(card1,Query);
+		card1.setLayout(new FormLayout(new ColumnSpec[] {
+				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("max(132dlu;default)"),
+				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("default:grow"),
+				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("max(66dlu;default):grow"),},
+			new RowSpec[] {
+				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("max(20dlu;default)"),
+				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("max(19dlu;default)"),
+				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("max(20dlu;default)"),}));
+		
+		JLabel lblB1 = new JLabel("Find Projects Employing this supplier");
+		card1.add(lblB1, "2, 2, center, center");
+		
+		txtB1 = new JTextField();
+		card1.add(txtB1, "4, 2, center, default");
+		txtB1.setColumns(10);
+		
+		JButton btnGob1 = new JButton("Go");
+		btnGob1.addActionListener(new handelers());
+		card1.add(btnGob1, "6, 2");
+		
+		JLabel lblB2 = new JLabel("Find the parts supplied by this supplier");
+		card1.add(lblB2, "2, 4, center, center");
+		
+		txtB2 = new JTextField();
+		card1.add(txtB2, "4, 4, fill, default");
+		txtB2.setColumns(10);
+		
+		JButton btnGob2 = new JButton("Go");
+		btnGob2.addActionListener(new handelers());
+		card1.add(btnGob2, "6, 4");
+		
+		JLabel lblB3 = new JLabel("Find the total quantity of this part ");
+		card1.add(lblB3, "2, 6, right, center");
+		
+		txtB3 = new JTextField();
+		card1.add(txtB3, "4, 6, fill, default");
+		txtB3.setColumns(10);
+		
+		JButton btnGob3 = new JButton("Go");
+		btnGob3.addActionListener(new handelers());
+		card1.add(btnGob3, "6, 6");
+		contentPane.add(card2,Table);
+		setContentPane(contentPane);
+
+	}
+	
+
+
+	String chooseTableName = "";
+	DatabaseMetaData dbmd;
+	ListTableModel model;
+	
+	class handelers implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			if(e.getActionCommand().equalsIgnoreCase("Choose Table")){
+				chooseTableName = (String)JOptionPane.showInputDialog(
+				                    referenceFrame,
+				                    "Enter Table Name:\n",
+				                    "Enter Table Name",
+				                    JOptionPane.PLAIN_MESSAGE);
+
+				if (!((chooseTableName != null) && (chooseTableName.length() > 0))) {
+					JOptionPane.showMessageDialog(referenceFrame, 
+		                    "Please enter a valid table\n"+
+		                    "No value found");
+				}
+				else{
+					// JTable display and shit
+					try {
+						showTable();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+
+
+				}
+			
+			else if(e.getActionCommand().equalsIgnoreCase("Query")){
+				 CardLayout cl = (CardLayout)(contentPane.getLayout());
+			        cl.show(contentPane, "Query");
+			        System.out.println("ok");
+			}
+			else if(e.getActionCommand().equalsIgnoreCase("Populate")){
+				try {
+					dbms.uploadfile();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+			else if(e.getActionCommand().equalsIgnoreCase("Add")){
+				try {
+					addRow();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+
+		private void addRow() throws SQLException {
+			if(!chooseTableName.isEmpty()){
+				model.addRow(new Object[]{});
+				// create new JTable with one Row and get no of colomuns from model
+				// set it editable
+				// add it to the JFrame
+				// and add a button too
+				// when this button is pressed get all the values from row and insert that object into the model
+//				(table.getRowCount()-1)
+			}
+			else{}
+		}
+		
+	}
+
+	public void showTable() throws SQLException{
+		if(isTableExist(chooseTableName)==true){
+			// show the table here
+			CardLayout cl = (CardLayout)(contentPane.getLayout());
+			cl.show(contentPane, "Table");
+			resultSet = dbms.statement.executeQuery("Select * From "+chooseTableName);
+			model = ListTableModel.createModelFromResultSet( resultSet );
+			table.setModel(model);
+		}
+		else{
+			JOptionPane.showMessageDialog(referenceFrame, 
+                    "Please enter a valid table\n"+
+                    "Table doesn't exist");
+		}
+	}
+
+
+	private boolean isTableExist(String tableName) {
+		boolean returnVal = false;
+		try{
+			connection = dbms.connection;
+			dbmd = connection.getMetaData();
+			String[] types = {"TABLE"};
+			ResultSet rs = dbmd.getTables(null, null, "%", types);
+			while (rs.next()) {
+				if(rs.getString("TABLE_NAME").equalsIgnoreCase(tableName)){
+					returnVal = true;
+				}
+			}
+		} 
+		catch (SQLException e) {	
+			e.printStackTrace();
+		}
+		catch(NullPointerException e){
+			JOptionPane.showMessageDialog(referenceFrame, 
+                    "No Populated Table found\n"+
+                    "Please Populate the table first");
+		}
+		// get meta data and check
+		return returnVal;
+	}
+	
+
+ public void addrowJOptionPaneInput() {
+
+	 JTextField xField = new JTextField(5);
+	 JTextField yField = new JTextField(5);
+
+	 JPanel myPanel = new JPanel();
+	 myPanel.add(new JLabel("x:"));
+	 myPanel.add(xField);
+	 myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+	 myPanel.add(new JLabel("y:"));
+	 myPanel.add(yField);	
+
+	 int result = JOptionPane.showConfirmDialog(null, myPanel, 
+			 "Please Enter X and Y Values", JOptionPane.OK_CANCEL_OPTION);
+	 if (result == JOptionPane.OK_OPTION) {
+		 System.out.println("x value: " + xField.getText());
+		 System.out.println("y value: " + yField.getText());
+	 }
+	 
+	}
+	
+}
