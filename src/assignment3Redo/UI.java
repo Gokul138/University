@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -185,7 +186,6 @@ public class UI extends JFrame {
 		card1.add(btnGob3, "6, 6");
 		contentPane.add(card2,Table);
 		setContentPane(contentPane);
-
 	}
 	
 
@@ -260,11 +260,67 @@ public class UI extends JFrame {
 	                    "Enter Row Elements with # as delimiter",
 	                    JOptionPane.PLAIN_MESSAGE);
 				rowUserEntrySplit = rowUserEntry.split("#");
-				model.addRow(rowUserEntrySplit);
+				ArrayList<String> rowUserEntrySpliti = getTableColumnNames(chooseTableName);
+					StringBuilder sb = new StringBuilder("INSERT INTO "+chooseTableName+" (");
+					for(int i = 0;i<rowUserEntrySpliti.size();i++){
+						sb.append(rowUserEntrySpliti.get(i));
+						if(i!=rowUserEntrySpliti.size()-1){
+							sb.append(",");
+							}
+						else{
+							sb.append(") VALUES ");
+						}
+					}
+					if(appendValues(sb,rowUserEntrySplit)){
+						model.addRow(rowUserEntrySplit);
+					}
+					else{
+						JOptionPane.showMessageDialog(referenceFrame, "Input is not right, try again");
+					}
+
 			}
 			else{
 				JOptionPane.showMessageDialog(referenceFrame, "Please choose a tbale first");
 			}
+		}
+
+
+		private ArrayList<String> getTableColumnNames(String chooseTableName) throws SQLException {
+			ArrayList<String> retTableColu = new ArrayList<String>();
+			String sql = "select * from "+chooseTableName;
+            resultSet = dbms.statement.executeQuery(sql);
+            ResultSetMetaData metaData = resultSet.getMetaData();
+			int rowCount = metaData.getColumnCount();
+			for (int i = 0; i < rowCount; i++) {
+                retTableColu.add(metaData.getColumnName(i + 1));
+//                System.out.println(metaData.getColumnTypeName(i + 1));
+            }
+			return retTableColu;
+		}
+
+
+		private boolean appendValues(StringBuilder sb,
+				String[] rowUserEntrySplit)  {
+		boolean returnAvalue = true;
+		for(int i = 0; i< rowUserEntrySplit.length;i++){
+			if(i!=rowUserEntrySplit.length-1){
+				if(i == 0){
+					sb.append("(");
+				}
+				sb.append("'"+rowUserEntrySplit[i]+"',");
+			}
+			else{
+				sb.append("'"+rowUserEntrySplit[i]+"')");
+				}
+		}
+		System.out.println(sb.toString());
+		try {
+			dbms.statement.execute(sb.toString());
+			returnAvalue = true;
+		} catch (Exception e) {
+			returnAvalue = false;
+		}
+		return returnAvalue;
 		}
 	}
 
@@ -309,5 +365,5 @@ public class UI extends JFrame {
 		// get meta data and check
 		return returnVal;
 	}
-	
+
 }
