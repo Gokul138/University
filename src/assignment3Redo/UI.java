@@ -244,21 +244,28 @@ public class UI extends JFrame {
 					e1.printStackTrace();
 				}
 			}
+			else if(e.getActionCommand().equalsIgnoreCase("Delete")){
+				
+			}
 		}
 
-		private void addRow() throws SQLException {
-			if(!chooseTableName.isEmpty()){
-				model.addRow(new Object[]{});
-				// create new JTable with one Row and get no of colomuns from model
-				// set it editable
-				// add it to the JFrame
-				// and add a button too
-				// when this button is pressed get all the values from row and insert that object into the model
-//				(table.getRowCount()-1)
-			}
-			else{}
-		}
 		
+		private void addRow() throws SQLException {
+		String rowUserEntry = "";
+		String[] rowUserEntrySplit ;
+			if(!chooseTableName.isEmpty()){
+				rowUserEntry = (String)JOptionPane.showInputDialog(
+	                    referenceFrame,
+	                    "Enter Row:\n",
+	                    "Enter Row Elements with # as delimiter",
+	                    JOptionPane.PLAIN_MESSAGE);
+				rowUserEntrySplit = rowUserEntry.split("#");
+				model.addRow(rowUserEntrySplit);
+			}
+			else{
+				JOptionPane.showMessageDialog(referenceFrame, "Please choose a tbale first");
+			}
+		}
 	}
 
 	public void showTable() throws SQLException{
@@ -301,28 +308,6 @@ public class UI extends JFrame {
 		}
 		// get meta data and check
 		return returnVal;
-	}
-	
-
- public void addrowJOptionPaneInput() {
-
-	 JTextField xField = new JTextField(5);
-	 JTextField yField = new JTextField(5);
-
-	 JPanel myPanel = new JPanel();
-	 myPanel.add(new JLabel("x:"));
-	 myPanel.add(xField);
-	 myPanel.add(Box.createHorizontalStrut(15)); // a spacer
-	 myPanel.add(new JLabel("y:"));
-	 myPanel.add(yField);	
-
-	 int result = JOptionPane.showConfirmDialog(null, myPanel, 
-			 "Please Enter X and Y Values", JOptionPane.OK_CANCEL_OPTION);
-	 if (result == JOptionPane.OK_OPTION) {
-		 System.out.println("x value: " + xField.getText());
-		 System.out.println("y value: " + yField.getText());
-	 }
-	 
 	}
 	
 }
