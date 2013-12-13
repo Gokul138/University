@@ -11,23 +11,10 @@ import java.util.Scanner;
 
 public class parser {
 
-//	public static void main(String args[]) throws IOException{
-//		BufferedReader br = new BufferedReader(new FileReader("tables.txt"));
-//		parser pr = new parser();
-//		pr.get_tables(br);
-////		System.out.println(pr.getTableValuesPart(pr.getTable(br)));
-////		System.out.println(pr.getTableFieldPart(pr.getTable(br)));
-////		System.out.println(pr.getTableName(pr.getTableNamePart((pr.getTable(br)))));
-//		br.close();		
-//	}
-	
-	
-	
 	public ArrayList<String> get_tables(BufferedReader br) throws IOException {
 		ArrayList<String> line = new ArrayList<String>();
 		while(br.ready()){
 			String s = getTable(br);
-//			System.out.println(s);
 			line.add(s);
 		}
 		br.close();		
@@ -179,18 +166,3 @@ public class parser {
 
 
 }
-
-
-//String l_line = sc.nextLine();
-		//if(l_line.matches("(?i).*Table name:.*")){
-//			tableName = l_line.replaceAll(" ", "");
-//			tableName = tableName.substring(tableName.lastIndexOf(":") + 1);
-//			System.out.println(tableName);
-		//}
-		//else if(tableName.isEmpty()){
-//			l_line = sc.nextLine();
-//			tableName = l_line.replaceAll(" ", "");
-		//}
-		//}
-		//System.out.println(tableName);
-		//sc.close();		

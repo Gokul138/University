@@ -20,12 +20,9 @@ public class DBMS {
 	public void createConnection() throws Exception{
 		
 		try{
-			System.out.println("connecting to database");
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/test","root","hello");
-			System.out.println("Connection Successful");
 			statement = connection.createStatement();
-//			resultSet = statement.executeQuery("Select * From books");
 		}
 		catch(ClassNotFoundException error){
 			System.out.println("Error1: " + error.getMessage());
@@ -49,7 +46,6 @@ public class DBMS {
 			catch(SQLException error){
 				System.out.println("Error: " + error.getMessage());
 			}
-			System.out.println("");
 		}
 		br.close();
 	}
@@ -116,7 +112,6 @@ public class DBMS {
 			}
 		}
 		sb.append(")");
-//		System.out.print(sb.toString());
 		
 		return sb.toString();
 	}

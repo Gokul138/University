@@ -44,12 +44,9 @@ public class UI extends JFrame {
 	
 	JFrame referenceFrame = this;
 	
-	boolean rowaddEditable = false;
+	JLabel lblB1,lblB2,lblB3;
 	
 	DBMS dbms = new DBMS();
-	Statement statement = null;
-	Connection connection = null;
-	ResultSet resultSet = null;
 	/**
 	 * Launch the application.
 	 */
@@ -152,7 +149,7 @@ public class UI extends JFrame {
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("max(20dlu;default)"),}));
 		
-		JLabel lblB1 = new JLabel("Find Projects Employing this supplier");
+		lblB1 = new JLabel("Find Projects Employing this supplier");
 		card1.add(lblB1, "2, 2, center, center");
 		
 		txtB1 = new JTextField();
@@ -160,10 +157,11 @@ public class UI extends JFrame {
 		txtB1.setColumns(10);
 		
 		JButton btnGob1 = new JButton("Go");
+		btnGob1.setActionCommand("btnGob1");
 		btnGob1.addActionListener(new handelers());
 		card1.add(btnGob1, "6, 2");
 		
-		JLabel lblB2 = new JLabel("Find the parts supplied by this supplier");
+		lblB2 = new JLabel("Find the parts supplied by this supplier");
 		card1.add(lblB2, "2, 4, center, center");
 		
 		txtB2 = new JTextField();
@@ -171,10 +169,11 @@ public class UI extends JFrame {
 		txtB2.setColumns(10);
 		
 		JButton btnGob2 = new JButton("Go");
+		btnGob2.setActionCommand("btnGob2");
 		btnGob2.addActionListener(new handelers());
 		card1.add(btnGob2, "6, 4");
 		
-		JLabel lblB3 = new JLabel("Find the total quantity of this part ");
+		lblB3 = new JLabel("Find the total quantity of this part ");
 		card1.add(lblB3, "2, 6, right, center");
 		
 		txtB3 = new JTextField();
@@ -182,6 +181,7 @@ public class UI extends JFrame {
 		txtB3.setColumns(10);
 		
 		JButton btnGob3 = new JButton("Go");
+		btnGob3.setActionCommand("btnGob3");
 		btnGob3.addActionListener(new handelers());
 		card1.add(btnGob3, "6, 6");
 		contentPane.add(card2,Table);
@@ -227,7 +227,6 @@ public class UI extends JFrame {
 			else if(e.getActionCommand().equalsIgnoreCase("Query")){
 				 CardLayout cl = (CardLayout)(contentPane.getLayout());
 			        cl.show(contentPane, "Query");
-			        System.out.println("ok");
 			}
 			else if(e.getActionCommand().equalsIgnoreCase("Populate")){
 				try {
@@ -240,16 +239,79 @@ public class UI extends JFrame {
 				try {
 					addRow();
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
 			else if(e.getActionCommand().equalsIgnoreCase("Delete")){
-				
+				deleteRow((String)JOptionPane.showInputDialog(
+	                    referenceFrame,
+	                    "Enter Key of row to delete:\n",
+	                    "Enter Key to delete row",
+	                    JOptionPane.PLAIN_MESSAGE));
+
+			}
+			else if(e.getActionCommand().equalsIgnoreCase("btnGob1")){
+//				select PNO from SPJ where SNO='S1';
+				try {
+					String sql = "select distinct PNO from SPJ where SNO='"+txtB1.getText()+"';";
+					dbms.resultSet = dbms.statement.executeQuery(sql);
+					model = ListTableModel.createModelFromResultSet( dbms.resultSet );
+					table.setModel(model);
+					CardLayout cl = (CardLayout)(contentPane.getLayout());
+			        cl.show(contentPane, "Table");
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			else if(e.getActionCommand().equalsIgnoreCase("btnGob2")){
+				//	select distinct PNO from SPJ,S where SPJ.SNO=S.SNO and S.SNAME = 'Smith';
+				try {
+					String sql = "select distinct PNO from SPJ,S where SPJ.SNO=S.SNO and S.SNAME = '"+txtB1.getText()+"';";
+					dbms.resultSet = dbms.statement.executeQuery(sql);
+					model = ListTableModel.createModelFromResultSet( dbms.resultSet );
+					table.setModel(model);
+					CardLayout cl = (CardLayout)(contentPane.getLayout());
+			        cl.show(contentPane, "Table");
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+			else if(e.getActionCommand().equalsIgnoreCase("btnGob3")){
+//				select QTY from SPJ where PNO='P3';	
+				try {
+					String sql = "select QTY from SPJ where PNO='"+txtB1.getText()+"';";
+					dbms.resultSet = dbms.statement.executeQuery(sql);
+					model = ListTableModel.createModelFromResultSet( dbms.resultSet );
+					table.setModel(model);
+					CardLayout cl = (CardLayout)(contentPane.getLayout());
+			        cl.show(contentPane, "Table");
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 
 		
+		private void deleteRow(String showInputDialog) {
+			try {
+				dbms.resultSet = dbms.statement.executeQuery("select * from "+chooseTableName);
+				ResultSetMetaData metaData = dbms.resultSet.getMetaData();
+				String columnName = metaData.getColumnName(1);
+				String sql = "DELETE FROM "+chooseTableName+" WHERE " +columnName+ " = '"+showInputDialog+"';";
+				int delete = dbms.statement.executeUpdate(sql);
+				if(delete!=1){
+					JOptionPane.showMessageDialog(referenceFrame, "You entered a invalid key, delete!=1");
+				}
+				else{
+					showTable();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(referenceFrame, "You entered a invalid key");
+			}
+		}
+
+
 		private void addRow() throws SQLException {
 		String rowUserEntry = "";
 		String[] rowUserEntrySplit ;
@@ -288,12 +350,11 @@ public class UI extends JFrame {
 		private ArrayList<String> getTableColumnNames(String chooseTableName) throws SQLException {
 			ArrayList<String> retTableColu = new ArrayList<String>();
 			String sql = "select * from "+chooseTableName;
-            resultSet = dbms.statement.executeQuery(sql);
-            ResultSetMetaData metaData = resultSet.getMetaData();
+            dbms.resultSet = dbms.statement.executeQuery(sql);
+            ResultSetMetaData metaData = dbms.resultSet.getMetaData();
 			int rowCount = metaData.getColumnCount();
 			for (int i = 0; i < rowCount; i++) {
                 retTableColu.add(metaData.getColumnName(i + 1));
-//                System.out.println(metaData.getColumnTypeName(i + 1));
             }
 			return retTableColu;
 		}
@@ -313,7 +374,6 @@ public class UI extends JFrame {
 				sb.append("'"+rowUserEntrySplit[i]+"')");
 				}
 		}
-		System.out.println(sb.toString());
 		try {
 			dbms.statement.execute(sb.toString());
 			returnAvalue = true;
@@ -329,8 +389,8 @@ public class UI extends JFrame {
 			// show the table here
 			CardLayout cl = (CardLayout)(contentPane.getLayout());
 			cl.show(contentPane, "Table");
-			resultSet = dbms.statement.executeQuery("Select * From "+chooseTableName);
-			model = ListTableModel.createModelFromResultSet( resultSet );
+			dbms.resultSet = dbms.statement.executeQuery("Select * From "+chooseTableName);
+			model = ListTableModel.createModelFromResultSet( dbms.resultSet );
 			table.setModel(model);
 		}
 		else{
@@ -344,8 +404,7 @@ public class UI extends JFrame {
 	private boolean isTableExist(String tableName) {
 		boolean returnVal = false;
 		try{
-			connection = dbms.connection;
-			dbmd = connection.getMetaData();
+			dbmd = dbms.connection.getMetaData();
 			String[] types = {"TABLE"};
 			ResultSet rs = dbmd.getTables(null, null, "%", types);
 			while (rs.next()) {
